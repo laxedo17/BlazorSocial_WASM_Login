@@ -1,0 +1,37 @@
+@page "/login"
+@inject ILoxicaApi LoxicaApi
+
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <legend>Login de usuario</legend>
+        <div class="mb-3">
+            <label for="txtEmail" class="form-label">Email</label>
+            <input @bind="modeloLogin.Email" type="text" class="form-control" id="txtEmail" />
+        </div>
+
+        <div class="mb-3">
+            <label for="txtPassword" class="form-label">Password</label>
+            <input @bind="modeloLogin.Password" type="password" class="form-control" id="txtPassword" />
+        </div>
+
+        <!--Con este boton facemos chamada a API de login-->
+        <!--We use this button to call de API in order to login-->
+        <button type="button" @onclick="LoginUsuario" class="btn btn-primary">Entrar</button>
+    </div>
+</div>
+
+@code {
+    private LoginModel modeloLogin = new();
+
+    //Con este metodo chamamos a API
+    //We call the API using this method
+    private async Task LoginUsuario()
+    {
+        var mensaxe = await LoxicaApi.LoginAsync(modeloLogin);
+        if (mensaxe == "Success")
+        {
+
+        }
+    }
+
+}
