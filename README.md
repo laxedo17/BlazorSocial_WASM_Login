@@ -1,0 +1,1 @@
+# NET6_BlazorWasm_AuthCookiesRedesSociais
