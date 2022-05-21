@@ -1,5 +1,6 @@
 using SocialCookies.Bwasm.Modelos;
 
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 
@@ -34,6 +35,28 @@ public class LoxicaApi : ILoxicaApi
         {
             return "Error";
         }
+    }
 
+    public async Task<(string Mensaxe, UsuarioPerfilModel usuarioPerfil)> UsuarioPerfilAsync()
+    {
+        var factoriaCliente = _httpClientFactory.CreateClient("API");
+        //usamos perfil-usuario, mismo endpoint que en AuthController
+        //we use AuthController, same endpoint as in AuthController
+        var resposta = await factoriaCliente.GetAsync("/auth/usuario-perfil");
+        if (resposta.IsSuccessStatusCode)
+        {
+            return ("Success", await resposta.Content.ReadFromJsonAsync<UsuarioPerfilModel>());
+        }
+        else
+        {
+            if (resposta.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                return ("Unauthorized", null);
+            }
+            else
+            {
+                return ("Error", null);
+            }
+        }
     }
 }

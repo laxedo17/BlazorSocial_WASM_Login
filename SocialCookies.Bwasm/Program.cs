@@ -1,7 +1,10 @@
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+
 using SocialCookies.Bwasm;
 using SocialCookies.Bwasm.Loxica;
+using SocialCookies.Bwasm.Providers;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -20,5 +23,14 @@ builder.Services.AddHttpClient("API", options =>
 });
 
 builder.Services.AddScoped<ILoxicaApi, LoxicaApi>();
+
+//para autenticacion -- for authentication purposes
+builder.Services.AddOptions();
+builder.Services.AddAuthorizationCore();
+
+//rexistramos o noso AuthStateProvider personalizado
+//we register our customised AuthStateProvider
+builder.Services.AddScoped<AuthenticationStateProvider, PersonalAuthStateProvider>();
+
 
 await builder.Build().RunAsync();

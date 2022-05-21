@@ -1,12 +1,32 @@
-﻿<Router AppAssembly="@typeof(App).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-    </Found>
-    <NotFound>
-        <PageTitle>Not found</PageTitle>
-        <LayoutView Layout="@typeof(MainLayout)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
-</Router>
+﻿<!--Envolvemos todo o contido orixinal de App.razor nun componente CascadingAuthenticatioState
+que pasa unha property en cascada como authentication state property
+asi que os componentes Blazor poden ler esa propiedade e poden entender
+se un usuario esta ou non autenticado
+-->
+<!--We wrap all the original content of App.razon within a CascadingAuthenticatioState
+component which passes a cascading property like authentication state
+so Blazor componentes can read that property and can understand
+whether a user is authenticated or not-->
+<CascadingAuthenticationState>
+    <!--Con OnNavigationAsync o metodo executarase en CADA reload da web-->
+    <Router AppAssembly="@typeof(App).Assembly">
+        <Found Context="routeData">
+            <!--Cambiamos RouteView por defecto agregando AuthorizeRouteView-->
+            <!--We modify RouteView by default adding AuthorizeRouteView-->
+            <AuthorizeRouteView RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+<!--Fin CascadingAuthenticationState-->
+
+@code 
+{
+
+}
