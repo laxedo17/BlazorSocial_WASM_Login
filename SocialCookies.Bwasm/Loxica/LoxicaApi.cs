@@ -1,6 +1,7 @@
+using SocialCookies.Bwasm.Modelos;
+
 using System.Text;
 using System.Text.Json;
-using SocialCookies.Bwasm.Modelos;
 
 namespace SocialCookies.Bwasm.Loxica;
 
@@ -16,7 +17,7 @@ public class LoxicaApi : ILoxicaApi
     public async Task<string> LoginAsync(LoginModel loginModel)
     {
         //usamos o mesmo nome da configuracion de Program.cs
-        //we use the same name, API, from the configuration in the Program.cs
+        //we use the same name, API, from the configuration in the Program.cs file
         var factoriaCliente = _httpClientFactory.CreateClient("API");
 
         //payload: headers
