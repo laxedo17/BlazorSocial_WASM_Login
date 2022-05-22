@@ -37,7 +37,7 @@ public class LoxicaApi : ILoxicaApi
         }
     }
 
-    public async Task<(string Mensaxe, UsuarioPerfilModel usuarioPerfil)> UsuarioPerfilAsync()
+    public async Task<(string Mensaxe, UsuarioPerfilModel UsuarioPerfil)> UsuarioPerfilAsync()
     {
         var factoriaCliente = _httpClientFactory.CreateClient("API");
         //usamos perfil-usuario, mismo endpoint que en AuthController

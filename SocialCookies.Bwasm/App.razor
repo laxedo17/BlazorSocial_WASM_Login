@@ -1,4 +1,7 @@
-﻿<!--Envolvemos todo o contido orixinal de App.razor nun componente CascadingAuthenticatioState
+﻿@inject ILoxicaApi loxicaAPI
+@inject AuthenticationStateProvider authStateProvider
+
+<!--Envolvemos todo o contido orixinal de App.razor nun componente CascadingAuthenticatioState
 que pasa unha property en cascada como authentication state property
 asi que os componentes Blazor poden ler esa propiedade e poden entender
 se un usuario esta ou non autenticado
@@ -9,11 +12,11 @@ so Blazor componentes can read that property and can understand
 whether a user is authenticated or not-->
 <CascadingAuthenticationState>
     <!--Con OnNavigationAsync o metodo executarase en CADA reload da web-->
-    <Router AppAssembly="@typeof(App).Assembly">
+    <Router AppAssembly="@typeof(App).Assembly" OnNavigateAsync="@OnNavigateAsync">
         <Found Context="routeData">
-            <!--Cambiamos RouteView por defecto agregando AuthorizeRouteView-->
-            <!--We modify RouteView by default adding AuthorizeRouteView-->
-            <AuthorizeRouteView RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+            <!--Cambiamos RouteView por defecto agregando AuthorizeRouteView (feito esto hai que quitar RouteView para evitar unha excepcion)-->
+            <!--We modify RouteView by default adding AuthorizeRouteView (you must remove RouteView component afterwards to prevent any exception)-->
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
             <FocusOnNavigate RouteData="@routeData" Selector="h1" />
         </Found>
         <NotFound>
@@ -25,8 +28,29 @@ whether a user is authenticated or not-->
     </Router>
 </CascadingAuthenticationState>
 <!--Fin CascadingAuthenticationState-->
-
-@code 
+@code
 {
+    private async Task OnNavigateAsync(NavigationContext context)
+    {
+        //obtemos informacion de usuario convertindo authStateProvider
+        //ao noso PersonalAuthStateProvider
+        //we get user information converting authStateProvider
+        //to our PersonalAuthStateProvider
+        var usuario = (await (authStateProvider as PersonalAuthStateProvider).GetAuthenticationStateAsync()).User;
+        var resposta = await loxicaAPI.UsuarioPerfilAsync();
 
+        if (resposta.Mensaxe == "Success")
+        {
+            //como non podemos inxectar PersonalAuthStateProvider tal cal
+            //usamos authStateProvider, que si e unha instancia de AuthenticationStateProvider
+            // que si podemos inxectar
+            //convertirmos authStateProvider en PersonalAuthStateProvider
+            (authStateProvider as PersonalAuthStateProvider)
+            .SetAuthenticationInfo(resposta.UsuarioPerfil);
+        }
+        else
+        {
+
+        }
+    }
 }

@@ -1,5 +1,6 @@
 @page "/login"
 @inject ILoxicaApi LoxicaApi
+@inject NavigationManager navigationManager
 
 <div class="row">
     <div class="col-md-6 offset-md-3">
@@ -31,6 +32,9 @@
         if (mensaxe == "Success")
         {
 
+            //con "/" imos a paxina princial
+            //e con true forzamos un reload cada vez
+            navigationManager.NavigateTo("/", true);
         }
     }
 

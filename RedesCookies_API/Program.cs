@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+
 using RedesCookies_API.Db.Entity;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,7 +31,9 @@ builder.Services.AddCors(options =>
     {
         builder.AllowAnyHeader()
         .AllowAnyMethod()
-        .AllowAnyOrigin();
+        // .AllowAnyOrigin() non podemos usar AllowAnyOrigin cando usamos AllowCredentials, co cal...usamos
+        .SetIsOriginAllowed(options => true)
+        .AllowCredentials();//para evitar exception de usar o delegate handler ao xenerar as cookies
     });
 });
 

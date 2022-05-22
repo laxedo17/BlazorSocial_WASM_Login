@@ -1,1 +1,25 @@
-<a href="/login">Entrar</a>
+@*<a href="/login">Entrar</a>*@
+
+<!--Usamos componente AuthorizeView-->
+<AuthorizeView>
+    <Authorized>
+        <!--Mostramos nome de perfil por iso href non e nada-->
+        <!--Para ler os datos do AuthStateProvider (AuthenticationState) no componente AuthorizeView usamos context-->
+        <a href="#">
+            @context.User.Identity?.Name !
+        </a>
+        <button type="button" class="nav-link btn btn-link">Saír (Logout)</button>
+        <!--Fin mostrar nome de perfil-->
+    </Authorized>
+    <NotAuthorized>
+        <a href="/login">Entrar</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code 
+{
+    //e un CascadingParameter porque usamos o componente CascadingAuthenticationState en App.razor
+    //it is a CascadingParameter because we use the CascadingAuthenticationState component in App.razor
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthenticationState {get;set;}
+}
