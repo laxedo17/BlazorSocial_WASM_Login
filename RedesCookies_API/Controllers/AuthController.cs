@@ -82,4 +82,12 @@ public class AuthController : ControllerBase
 
         return Ok(perfilUsuario);
     }
+
+    [HttpPost]
+    [Route("logout")]
+    public async Task<IActionResult> LogoutAsync()
+    {
+        await HttpContext.SignOutAsync();
+        return Ok("Success");
+    }
 }

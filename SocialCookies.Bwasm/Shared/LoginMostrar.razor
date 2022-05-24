@@ -1,3 +1,8 @@
+@inject ILoxicaApi _loxicaAPI
+<!--inxectamos a interfaz ILoxicaApi para usar metodo Logout. We inject IloxicaApi interface para usar metodo Logout-->
+@inject ILocalStorageService _localStorage
+@inject NavigationManager _navigationManager
+<!--usamos NavigationManager para facer reload a paxina. We use NavigationManager to reload the page-->
 @*<a href="/login">Entrar</a>*@
 
 <!--Usamos componente AuthorizeView-->
@@ -8,7 +13,7 @@
         <a href="#">
             @context.User.Identity?.Name !
         </a>
-        <button type="button" class="nav-link btn btn-link">Saír (Logout)</button>
+        <button type="button" @onclick="Logout" class="nav-link btn btn-link">Saír (Logout)</button>
         <!--Fin mostrar nome de perfil-->
     </Authorized>
     <NotAuthorized>
@@ -20,6 +25,19 @@
 {
     //e un CascadingParameter porque usamos o componente CascadingAuthenticationState en App.razor
     //it is a CascadingParameter because we use the CascadingAuthenticationState component in App.razor
-    [CascadingParameter]
-    public Task<AuthenticationState> AuthenticationState { get; set; }
+    //[CascadingParameter]
+    //public Task<AuthenticationState> AuthenticationState { get; set; }
+
+    private async Task Logout()
+    {
+        //resposta do server, do cal eliminaremos a cookie
+        //response from the server, from which we will remove the cookie
+        var resposta = await _loxicaAPI.LogoutAsync();
+        if (resposta == "Success")
+        {
+            await _localStorage.RemoveItemAsync("isautenticado");
+            //reload tras facer logout. Reload after logout.
+            _navigationManager.NavigateTo("/", true);
+        }
+    }
 }

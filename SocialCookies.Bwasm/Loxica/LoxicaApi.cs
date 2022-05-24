@@ -59,4 +59,17 @@ public class LoxicaApi : ILoxicaApi
             }
         }
     }
+
+
+    public async Task<string> LogoutAsync()
+    {
+        var factoriaCliente = _httpClientFactory.CreateClient("API");
+        var resposta = await factoriaCliente.PostAsync("/auth/logout", null);
+
+        if (resposta.IsSuccessStatusCode)
+        {
+            return "Success";
+        }
+        return "Error";
+    }
 }

@@ -6,4 +6,5 @@ public interface ILoxicaApi
 {
     Task<string> LoginAsync(LoginModel loginModel);
     Task<(string Mensaxe, UsuarioPerfilModel UsuarioPerfil)> UsuarioPerfilAsync();
+    Task<string> LogoutAsync();
 }
