@@ -16,10 +16,10 @@
     </NotAuthorized>
 </AuthorizeView>
 
-@code 
+@code
 {
     //e un CascadingParameter porque usamos o componente CascadingAuthenticationState en App.razor
     //it is a CascadingParameter because we use the CascadingAuthenticationState component in App.razor
     [CascadingParameter]
-    public Task<AuthenticationState> AuthenticationState {get;set;}
+    public Task<AuthenticationState> AuthenticationState { get; set; }
 }

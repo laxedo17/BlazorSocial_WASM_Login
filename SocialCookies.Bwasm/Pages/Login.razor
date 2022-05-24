@@ -1,6 +1,7 @@
 @page "/login"
 @inject ILoxicaApi LoxicaApi
 @inject NavigationManager navigationManager
+@inject ILocalStorageService _localStorage;
 
 <div class="row">
     <div class="col-md-6 offset-md-3">
@@ -28,10 +29,13 @@
     //We call the API using this method
     private async Task LoginUsuario()
     {
+
+
         var mensaxe = await LoxicaApi.LoginAsync(modeloLogin);
         if (mensaxe == "Success")
         {
-
+            await _localStorage.SetItemAsStringAsync("isautenticado", "true");
+            //"isautenticado" e unha key. isautenticado is a key
             //con "/" imos a paxina princial
             //e con true forzamos un reload cada vez
             navigationManager.NavigateTo("/", true);

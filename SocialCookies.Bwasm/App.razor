@@ -1,5 +1,6 @@
 ﻿@inject ILoxicaApi loxicaAPI
 @inject AuthenticationStateProvider authStateProvider
+@inject ILocalStorageService _localStorage
 
 <!--Envolvemos todo o contido orixinal de App.razor nun componente CascadingAuthenticatioState
 que pasa unha property en cascada como authentication state property
@@ -32,25 +33,45 @@ whether a user is authenticated or not-->
 {
     private async Task OnNavigateAsync(NavigationContext context)
     {
+        //usamos a key que lle demos en Login.razor, "isautenticado"
+        //we use the key we added in Login.razor, "isautenticado"
+        var auth = await _localStorage.GetItemAsStringAsync("isautenticado");
+
         //obtemos informacion de usuario convertindo authStateProvider
         //ao noso PersonalAuthStateProvider
         //we get user information converting authStateProvider
         //to our PersonalAuthStateProvider
         var usuario = (await (authStateProvider as PersonalAuthStateProvider).GetAuthenticationStateAsync()).User;
-        var resposta = await loxicaAPI.UsuarioPerfilAsync();
 
-        if (resposta.Mensaxe == "Success")
+        //agora ao acceder a login de usuario con "Success" exitosamente
+        // estaran disponhibles
+        // a api de perfil de usuario facendo unha call
+        //e o localstorage coa variable "isautenticado"
+        //now when accessing the user login with "Success"
+        //both the api from the user profile performing a call
+        //and the localstorage containing the variable "isautenticado", will be available
+        //the user can access his/her account
+        if (!string.IsNullOrEmpty(auth) && !usuario.Identity.IsAuthenticated)
         {
-            //como non podemos inxectar PersonalAuthStateProvider tal cal
-            //usamos authStateProvider, que si e unha instancia de AuthenticationStateProvider
-            // que si podemos inxectar
-            //convertirmos authStateProvider en PersonalAuthStateProvider
-            (authStateProvider as PersonalAuthStateProvider)
-            .SetAuthenticationInfo(resposta.UsuarioPerfil);
-        }
-        else
-        {
+            var resposta = await loxicaAPI.UsuarioPerfilAsync();
 
+            if (resposta.Mensaxe == "Success")
+            {
+                //como non podemos inxectar PersonalAuthStateProvider tal cal
+                //usamos authStateProvider, que si e unha instancia de AuthenticationStateProvider
+                // que si podemos inxectar
+                //convertirmos authStateProvider en PersonalAuthStateProvider
+                (authStateProvider as PersonalAuthStateProvider)
+                .SetAuthenticationInfo(resposta.UsuarioPerfil);
+            }
+            else
+            {
+                //en caso contrario, eliminamos a variable "isautenticado"
+                //para evitar chamadas a API non desexada
+                //otherwise, we remove the variable "isautenticado"
+                //to prevent unwanted API calls
+                await _localStorage.RemoveItemAsync("isautenticado");
+            }
         }
     }
 }
