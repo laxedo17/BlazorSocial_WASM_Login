@@ -20,7 +20,13 @@ builder.Services.AddDbContext<SocialAuthDbContext>(options =>
 
 builder.Services.AddAuthentication(
     CookieAuthenticationDefaults.AuthenticationScheme
-).AddCookie();
+).AddCookie()
+//rexistramos nosa facebook id e secret/We register our facebook id and secret
+.AddFacebook(fb =>
+{
+    fb.AppId = builder.Configuration.GetSection("FacebookSettings").GetValue<string>("AppId");
+    fb.AppSecret = builder.Configuration.GetSection("FacebookSettings").GetValue<string>("AppSecret");
+});
 
 //para permitir CORS e que non haxa conflicto entre o porto que usa a API e o da app Blazor WASM
 //to allow CORS so that there is no conflict between the port that uses the API and the port belonging to the Blazor WASM app

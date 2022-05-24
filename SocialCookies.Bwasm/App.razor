@@ -37,6 +37,16 @@ whether a user is authenticated or not-->
         //we use the key we added in Login.razor, "isautenticado"
         var auth = await _localStorage.GetItemAsStringAsync("isautenticado");
 
+        //para usuario autenticado con facebook, cuio control non temos en localstorage
+        //for an user authenticated with facebook, something we dont control in localstorage
+        //usamos a query parameter de return Redirect the authcontroller
+        //we use the query parameter from return Redirect de authcontroller
+        if (string.IsNullOrEmpty(auth) && context.Path.ToLower().Contains("externalauth=true"))
+        {
+            auth = "true";
+            await _localStorage.SetItemAsStringAsync("isautenticado", "true");
+        }
+
         //obtemos informacion de usuario convertindo authStateProvider
         //ao noso PersonalAuthStateProvider
         //we get user information converting authStateProvider
