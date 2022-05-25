@@ -21,14 +21,22 @@
         <button type="button" @onclick="LoginUsuario" class="btn btn-primary">Entrar</button>
     </div>
 </div>
-<!--Engadimos boton para acceso con facebook. We add a button to login with facebook-->
+<!--Seccion para engabir botons redes sociais. Section to add buttons for social networks-->
 <div class="row">
+    <!--Engadimos boton para acceso con facebook. We add a button to login with facebook-->
     <div class="col-md-6 offset-md-3">
         <a href="https://localhost:7061/auth/login-facebook?returnUrl=https://localhost:7166/"
            class="nav-link btn btn-link">Facebook</a>
     </div>
+    <!--Fin boton acceso facebook. End of button to login with facebook-->
+    <!--Boton twitter. Twitter button-->
+    <div class="col-md-6 offset-md-3">
+        <a href="https://localhost:7061/auth/login-twitter?returnUrl=https://localhost:7166/"
+           class="nav-link btn btn-link">Twitter</a>
+    </div>
+    <!--Fin boton twitter. End of Twitter button-->
 </div>
-<!--Fin boton acceso facebook. End of button to login with facebook-->
+<!--Fin seccion botons redes sociais. End of buttons section for social networks-->
 @code {
     private LoginModel modeloLogin = new();
 

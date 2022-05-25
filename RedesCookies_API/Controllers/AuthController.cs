@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Authentication.Twitter;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -163,6 +164,50 @@ public class AuthController : ControllerBase
         return Redirect($"{returnUrl}?externalauth=false");
     }
 
+    [HttpGet]
+    [Route("login-twitter")]
+    public IActionResult LoginTwitter(string returnUrl)
+    {
+        return Challenge(
+            new AuthenticationProperties
+            {
+                //chamamos Action method no noso AuthController
+                //we call an Action method in our AuthController
+                RedirectUri = Url.Action(nameof(LoginTwitterCallback), new { returnUrl })
+            },
+            TwitterDefaults.AuthenticationScheme
+        );
+    }
+
+    [HttpGet]
+    [Route("login-twitter-callback")]
+    public async Task<ActionResult> LoginTwitterCallback(string returnUrl)
+    {
+        var resultadoAutenticacion = await HttpContext.AuthenticateAsync(TwitterDefaults.AuthenticationScheme);
+        if (resultadoAutenticacion.Succeeded)
+        {
+            string email = HttpContext.User.Claims
+                .Where(_ => _.Type == ClaimTypes.Email)
+                .Select(_ => _.Value).FirstOrDefault();
+
+            string nome = HttpContext.User.Claims
+                .Where(_ => _.Type == ClaimTypes.GivenName)
+                .Select(_ => _.Value).FirstOrDefault();
+
+            string apelidos = HttpContext.User.Claims
+                .Where(_ => _.Type == ClaimTypes.Surname)
+                .Select(_ => _.Value).FirstOrDefault();
+
+            var usuario = await XestionarExternalLoginUsuario(email, nome, apelidos, "Twitter");
+
+            await RefrescarExternalLogin(usuario);
+
+            return Redirect($"{returnUrl}?externalauth=true");
+        }
+
+        return Redirect($"{returnUrl}?externalauth=false");
+    }
+
     /// <summary>
     /// Metodo comun para manexar o login en redes sociais de facebook, microsoft, google e twitter.
     /// Common method to manage the user login on social networks: facebook, microsoft, google and twitter.
@@ -182,12 +227,16 @@ public class AuthController : ControllerBase
         var usuario = await _socialAuthDbContext
             .Usuarios.Where(_ => _.Email.ToLower() == email.ToLower() && _.ExternalLoginNome == externalLoginNome)
             .FirstOrDefaultAsync();
+
+        //se usuario existe, devolvemos o usuario
+        //if the user exists, we return the user    
         if (usuario != null)
         {
             return usuario;
         }
 
-        //engadimos usuario novo a BD. We add the new user to the DB
+        //se usuario non existe, engadimos usuario novo a BD
+        //If the user doesnt exist, we add the new user to the DB
         var novoUsuario = new Usuario
         {
             Email = email,
@@ -221,6 +270,8 @@ public class AuthController : ControllerBase
         //we override the information obtained from the cookie from facebook, microsoft, google, twitter etc
         HttpContext.User.AddIdentity(claimsIdentity);
 
+        //quitamos o user login co cookie actual
+        //we remove the user login with the current cookie
         await HttpContext.SignOutAsync();
 
         //agora creamos unha nova cookie cos datos de usuario gardados na BD
