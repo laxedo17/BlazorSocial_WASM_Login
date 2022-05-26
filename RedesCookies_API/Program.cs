@@ -33,6 +33,11 @@ builder.Services.AddAuthentication(
     t.ConsumerSecret = builder.Configuration.GetSection("Twitter").GetValue<string>("ApiSecret");
     t.RetrieveUserDetails = true;
 
+})
+.AddMicrosoftAccount(mi =>
+{
+    mi.ClientId = builder.Configuration.GetSection("Microsoft").GetValue<string>("ClientId");
+    mi.ClientSecret = builder.Configuration.GetSection("Microsoft").GetValue<string>("ClientSecret"); ;
 });
 
 //para permitir CORS e que non haxa conflicto entre o porto que usa a API e o da app Blazor WASM

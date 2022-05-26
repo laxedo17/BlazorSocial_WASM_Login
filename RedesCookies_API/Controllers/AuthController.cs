@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
 using Microsoft.AspNetCore.Authentication.Twitter;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -143,7 +144,10 @@ public class AuthController : ControllerBase
                 .Select(_ => _.Value).FirstOrDefault();
 
             string nome = HttpContext.User.Claims
-                .Where(_ => _.Type == ClaimTypes.Name)
+                //a linha comentada abaixo devolve Nome Apelidos Apelidos (repetidos), co cal temos que usar .GivenName para evitar ese problema
+                //commented line below would work, but gives you Firstname Surname Surname (repeated), so we gotta use .GivenName to avoid that issue
+                //.Where(_ => _.Type == ClaimTypes.Name)
+                .Where(_ => _.Type == ClaimTypes.GivenName)
                 .Select(_ => _.Value).FirstOrDefault();
 
             string apelidos = HttpContext.User.Claims
@@ -199,6 +203,49 @@ public class AuthController : ControllerBase
                 .Select(_ => _.Value).FirstOrDefault();
 
             var usuario = await XestionarExternalLoginUsuario(email, nome, apelidos, "Twitter");
+
+            await RefrescarExternalLogin(usuario);
+
+            return Redirect($"{returnUrl}?externalauth=true");
+        }
+
+        return Redirect($"{returnUrl}?externalauth=false");
+    }
+
+    [HttpGet]
+    [Route("login-microsoft")]
+    public IActionResult LoginMicrosoft(string returnUrl)
+    {
+        return Challenge(
+            new AuthenticationProperties
+            {
+                RedirectUri = Url.Action(nameof(LoginMicrosoftCallback), new { returnUrl })
+            },
+            MicrosoftAccountDefaults.AuthenticationScheme
+        );
+    }
+
+    [HttpGet]
+    [Route("login-microsoft-callback")]
+    public async Task<IActionResult> LoginMicrosoftCallback(string returnUrl)
+    {
+        var resultadoAutenticacion = await HttpContext.AuthenticateAsync(MicrosoftAccountDefaults.AuthenticationScheme);
+
+        if (resultadoAutenticacion.Succeeded)
+        {
+            string email = HttpContext.User.Claims
+                .Where(_ => _.Type == ClaimTypes.Email)
+                .Select(_ => _.Value).FirstOrDefault();
+
+            string nome = HttpContext.User.Claims
+                .Where(_ => _.Type == ClaimTypes.GivenName)
+                .Select(_ => _.Value).FirstOrDefault();
+
+            string apelidos = HttpContext.User.Claims
+                .Where(_ => _.Type == ClaimTypes.Surname)
+                .Select(_ => _.Value).FirstOrDefault();
+
+            var usuario = await XestionarExternalLoginUsuario(email, nome, apelidos, "microsoft");
 
             await RefrescarExternalLogin(usuario);
 
